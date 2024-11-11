@@ -14,28 +14,28 @@ namespace DotnetAPI
             _configuration = configuration;
         }
 
-        public IEnumerable<T> LoadData<T>(string sql)
+        public IEnumerable<T> LoadData<T>(string sql, object parameters = null)
         {
             using IDbConnection dbConnection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            return dbConnection.Query<T>(sql);
+            return dbConnection.Query<T>(sql, parameters);
         }
 
-        public T LoadDataSingle<T>(string sql)
+        public T LoadDataSingle<T>(string sql, object parameters = null)
         {
             using IDbConnection dbConnection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            return dbConnection.QuerySingle<T>(sql);
+            return dbConnection.QuerySingle<T>(sql, parameters);
         }
 
-        public bool Execute(string sql)
+        public bool Execute(string sql, object parameters = null)
         {
             using IDbConnection dbConnection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            return dbConnection.Execute(sql) > 0;
+            return dbConnection.Execute(sql, parameters) > 0;
         }
         
-        public int ExecuteSqlWithRowCount(string sql)
+        public int ExecuteSqlWithRowCount(string sql, object parameters = null)
         {
             using IDbConnection dbConnection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            return dbConnection.Execute(sql);
+            return dbConnection.Execute(sql, parameters);
         }
     }
 }
