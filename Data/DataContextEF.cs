@@ -3,17 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DotnetAPI.Data
 {
-    public class DataContextEF : DbContext
+    public class DataContextEF(IConfiguration config) : DbContext
     {
-        private readonly IConfiguration _config;
-
-        public DataContextEF(IConfiguration config)
-        {
-            _config = config;
-        }
-        
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<UserSalary> UserSalaries { get; set; }
+        public virtual DbSet<UserSalary> UserSalary { get; set; }
         public virtual DbSet<UserJobInfo> UserJobInfos { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -21,7 +14,7 @@ namespace DotnetAPI.Data
             if (!optionsBuilder.IsConfigured)
             {
                 optionsBuilder
-                    .UseSqlServer(_config.GetConnectionString("DefaultConnection"),
+                    .UseSqlServer(config.GetConnectionString("DefaultConnection"),
                         optionsBuilder => optionsBuilder.EnableRetryOnFailure()
                         );
             }
@@ -32,7 +25,7 @@ namespace DotnetAPI.Data
             modelBuilder.HasDefaultSchema("TutorialAppSchema");
             
             modelBuilder.Entity<User>()
-                .ToTable("User","TutorialAppSchema")
+                .ToTable("Users","TutorialAppSchema")
                 .HasKey(u => u.UserId);
             
             modelBuilder.Entity<UserSalary>()
