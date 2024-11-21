@@ -1,3 +1,5 @@
+using DotnetAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -16,8 +18,10 @@ builder.Services.AddCors(options =>
     {
         policyBuilder.WithOrigins("https://myProductionSite.com")
             .AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-    });
+    }); 
 });
+
+builder.Services.AddScoped<IUserRepository, UserRepository>(); 
 
 var app = builder.Build();
 
