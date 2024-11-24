@@ -23,6 +23,8 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
 
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment()) 

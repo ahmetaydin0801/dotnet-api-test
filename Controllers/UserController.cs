@@ -158,7 +158,7 @@ public class UserController : ControllerBase
             return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
         }
     }
-    
+
     [HttpPost("AddUserSalary")]
     public IActionResult AddUserSalary(UserSalaryToAddDto userSalary)
     {
@@ -190,7 +190,7 @@ public class UserController : ControllerBase
             return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
         }
     }
-    
+
     [HttpDelete("DeleteUserSalary/{userId}")]
     public IActionResult DeleteUserSalary(int userId)
     {
@@ -202,6 +202,7 @@ public class UserController : ControllerBase
             {
                 return Ok("User salary deleted successfully");
             }
+
             return NotFound(new { Message = "No salary record found for the user" });
         }
         catch (Exception ex)
@@ -209,7 +210,7 @@ public class UserController : ControllerBase
             return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
         }
     }
-    
+
     [HttpPut("EditUserSalary")]
     public IActionResult EditUserSalary(UserSalaryToUpdateDto userSalary)
     {
@@ -242,37 +243,37 @@ public class UserController : ControllerBase
             return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
         }
     }
-    
+
     [HttpGet("GetUserJobInfo/{userId}")]
-public IActionResult GetUserJobInfo(int userId)
-{
-    string sql = @"
+    public IActionResult GetUserJobInfo(int userId)
+    {
+        string sql = @"
     SELECT [UserId], 
            [JobTitle], 
            [Department]
     FROM TutorialAppSchema.UserJobInfo
     WHERE UserId = @UserId";
 
-    try
-    {
-        UserJobInfo userJobInfo = _dapper.LoadDataSingle<UserJobInfo>(sql, new { UserId = userId });
-        return Ok(userJobInfo);
+        try
+        {
+            UserJobInfo userJobInfo = _dapper.LoadDataSingle<UserJobInfo>(sql, new { UserId = userId });
+            return Ok(userJobInfo);
+        }
+        catch (InvalidOperationException)
+        {
+            // This exception occurs if no rows are returned
+            return NotFound(new { Message = "User job information not found" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
+        }
     }
-    catch (InvalidOperationException)
-    {
-        // This exception occurs if no rows are returned
-        return NotFound(new { Message = "User job information not found" });
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
-    }
-}
 
-[HttpPost("AddUserJobInfo")]
-public IActionResult AddUserJobInfo(UserJobInfo userJobInfo)
-{
-    string sql = @"
+    [HttpPost("AddUserJobInfo")]
+    public IActionResult AddUserJobInfo(UserJobInfo userJobInfo)
+    {
+        string sql = @"
     INSERT INTO TutorialAppSchema.UserJobInfo (
         [UserId],
         [JobTitle],
@@ -284,84 +285,82 @@ public IActionResult AddUserJobInfo(UserJobInfo userJobInfo)
         @Department
     )";
 
-    try
-    {
-        if (_dapper.Execute(sql, new
-            {
-                UserId = userJobInfo.UserId,
-                JobTitle = userJobInfo.JobTitle,
-                Department = userJobInfo.Department
-            }))
+        try
         {
-            return Ok("Job information added successfully");
+            if (_dapper.Execute(sql, new
+                {
+                    UserId = userJobInfo.UserId,
+                    JobTitle = userJobInfo.JobTitle,
+                    Department = userJobInfo.Department
+                }))
+            {
+                return Ok("Job information added successfully");
+            }
+
+            return BadRequest("Failed to add job information");
         }
-
-        return BadRequest("Failed to add job information");
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
+        }
     }
-    catch (Exception ex)
+
+    [HttpPut("EditUserJobInfo")]
+    public IActionResult EditUserJobInfo(UserJobInfo userJobInfo)
     {
-        return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
-    }
-}
-
-[HttpPut("EditUserJobInfo")]
-public IActionResult EditUserJobInfo(UserJobInfo userJobInfo)
-{
-    string sql = @"
+        string sql = @"
     UPDATE TutorialAppSchema.UserJobInfo
     SET JobTitle = @JobTitle,
         Department = @Department
     WHERE UserId = @UserId";
 
-    try
-    {
-        // Validate if the user exists
-        string checkUserSql = "SELECT COUNT(1) FROM TutorialAppSchema.Users WHERE UserId = @UserId";
-        int userExists = _dapper.LoadDataSingle<int>(checkUserSql, new { UserId = userJobInfo.UserId });
-
-        if (userExists == 0)
+        try
         {
-            return BadRequest("Invalid user ID. User does not exist.");
-        }
+            // Validate if the user exists
+            string checkUserSql = "SELECT COUNT(1) FROM TutorialAppSchema.Users WHERE UserId = @UserId";
+            int userExists = _dapper.LoadDataSingle<int>(checkUserSql, new { UserId = userJobInfo.UserId });
 
-        // Perform the update
-        if (_dapper.Execute(sql, new
+            if (userExists == 0)
             {
-                UserId = userJobInfo.UserId,
-                JobTitle = userJobInfo.JobTitle,
-                Department = userJobInfo.Department
-            }))
-        {
-            return Ok("User job information updated successfully");
+                return BadRequest("Invalid user ID. User does not exist.");
+            }
+
+            // Perform the update
+            if (_dapper.Execute(sql, new
+                {
+                    UserId = userJobInfo.UserId,
+                    JobTitle = userJobInfo.JobTitle,
+                    Department = userJobInfo.Department
+                }))
+            {
+                return Ok("User job information updated successfully");
+            }
+
+            return NotFound(new { Message = "No job information found for the user" });
         }
-
-        return NotFound(new { Message = "No job information found for the user" });
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
-    }
-}
-
-[HttpDelete("DeleteUserJobInfo/{userId}")]
-public IActionResult DeleteUserJobInfo(int userId)
-{
-    string sql = "DELETE FROM TutorialAppSchema.UserJobInfo WHERE UserId = @UserId";
-
-    try
-    {
-        if (_dapper.Execute(sql, new { UserId = userId }))
+        catch (Exception ex)
         {
-            return Ok("User job information deleted successfully");
+            return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
         }
-
-        return NotFound(new { Message = "No job information record found for the user" });
     }
-    catch (Exception ex)
+
+    [HttpDelete("DeleteUserJobInfo/{userId}")]
+    public IActionResult DeleteUserJobInfo(int userId)
     {
-        return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
+        string sql = "DELETE FROM TutorialAppSchema.UserJobInfo WHERE UserId = @UserId";
+
+        try
+        {
+            if (_dapper.Execute(sql, new { UserId = userId }))
+            {
+                return Ok("User job information deleted successfully");
+            }
+
+            return NotFound(new { Message = "No job information record found for the user" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "An error occurred", Details = ex.Message });
+        }
     }
-}
-
-
 }
