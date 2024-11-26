@@ -89,3 +89,4 @@
 /Users/ahmetaydin/Desktop/DotnetAPI/bin/Debug/net8.0/System.Text.Encodings.Web.dll
 /Users/ahmetaydin/Desktop/DotnetAPI/bin/Debug/net8.0/System.Text.Json.dll
 /Users/ahmetaydin/Desktop/DotnetAPI/bin/Debug/net8.0/runtimes/browser/lib/net8.0/System.Text.Encodings.Web.dll
+/Users/ahmetaydin/Desktop/DotnetAPI/bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
