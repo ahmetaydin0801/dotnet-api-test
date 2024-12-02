@@ -13,7 +13,8 @@ namespace DotnetAPI.Helpers
         {
             _config = config;
         }
-        
+        // ASK how do you handle authentication
+        // ASK do you use helper
         public byte[] GetPasswordHash(string password, byte[] passwordSalt)
         {
             string passwordSaltPlusString = _config.GetSection("AppSettings:PasswordKey").Value +
@@ -36,6 +37,7 @@ namespace DotnetAPI.Helpers
                 new Claim("userId", userId.ToString()),
             };
 
+            // ASK what do you hold in appsettings
             string? tokenKeyString = _config.GetSection("AppSettings:TokenKey").Value;
 
 

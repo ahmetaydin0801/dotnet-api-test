@@ -2,6 +2,7 @@ using DotnetAPI.Models;
 
 namespace DotnetAPI.Data
 {
+    // ASK what is repository pattern and how does it work
     public interface IUserRepository
     {
         public bool SaveChanges();

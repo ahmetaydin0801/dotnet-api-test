@@ -3,6 +3,7 @@ using DotnetAPI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Dapper;
 using DotnetAPI.Dtos;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -21,11 +22,47 @@ namespace DotnetAPI.Controllers
         }
 
         [HttpGet("Posts")]
-        public IEnumerable<Post> GetPosts()
+        public ActionResult<IEnumerable<Post>> GetPosts(string? title = null, string? content = null, int? userId = null)
         {
-            string sql = @"SELECT PostId, UserId, PostTitle, PostContent, PostCreated, PostUpdated FROM TutorialAppSchema.Posts";
-            return _dapper.LoadData<Post>(sql);
+            try
+            {
+                // ASK how do you create parameters
+                var filters = new List<string>();
+                var parameters = new DynamicParameters();
+
+
+                if (!string.IsNullOrEmpty(title))
+                {
+                    filters.Add("PostTitle LIKE @Title");
+                    parameters.Add("Title", $"%{title}%");
+                }
+                if (!string.IsNullOrEmpty(content))
+                {
+                    filters.Add("PostContent LIKE @Content");
+                    parameters.Add("Content", $"%{content}%");
+                }
+                if (userId.HasValue)
+                {
+                    filters.Add("UserId = @UserId");
+                    parameters.Add("UserId", userId);
+                }
+
+
+                string filterQuery = filters.Count > 0 ? "WHERE " + string.Join(" AND ", filters) : "";
+                string sql = $@"
+            SELECT PostId, UserId, PostTitle, PostContent, PostCreated, PostUpdated 
+            FROM TutorialAppSchema.Posts 
+            {filterQuery}";
+
+                var posts = _dapper.LoadData<Post>(sql, parameters);
+                return Ok(posts);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
+
 
         [HttpGet("Post/{postId}")]
         public Post GetPost(int postId)
@@ -41,7 +78,7 @@ namespace DotnetAPI.Controllers
         [HttpGet("MyPosts")]
         public IEnumerable<Post> GetMyPosts()
         {
-            // Retrieve the UserId from the authenticated user's claims
+            // ASK what is claim
             var userIdClaim = User.FindFirst("userId");
             if (userIdClaim == null)
             {

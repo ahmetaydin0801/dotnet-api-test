@@ -22,6 +22,8 @@ namespace DotnetAPI.Controllers
         private readonly DataContextDapper _dapper;
 
         private readonly AuthHelper _authHelper;
+        
+        // ASK manually instantiated
 
         public AuthController(IConfiguration config)
         {
@@ -68,20 +70,20 @@ namespace DotnetAPI.Controllers
                     if (_dapper.ExecuteSqlWithParameters(sqlAddAuth, sqlParams))
                     {
 
-                        string sqlAddUser = @"
-    INSERT INTO TutorialAppSchema.Users (
-        [FirstName],
-        [LastName],
-        [Email],
-        [Gender]
-    )
-    VALUES (
-        @FirstName,
-        @LastName,
-        @Email,
-        @Gender
-    );
-";
+                                            string sqlAddUser = @"
+                        INSERT INTO TutorialAppSchema.Users (
+                            [FirstName],
+                            [LastName],
+                            [Email],
+                            [Gender]
+                        )
+                        VALUES (
+                            @FirstName,
+                            @LastName,
+                            @Email,
+                            @Gender
+                        );
+                    ";
 
                         if (_dapper.Execute(sqlAddUser, new
                         {
@@ -111,6 +113,7 @@ namespace DotnetAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
+        // ASK do you use DTO
         public IActionResult Login(UserForLoginDto userForLogin)
         {
             string sqlForHashAndSalt =

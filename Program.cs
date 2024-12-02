@@ -23,8 +23,10 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod().AllowAnyHeader().AllowCredentials();
     }); 
 });
+// ASK How you define CORS
 
 builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+// ASK AddScoped
 
 
 string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
